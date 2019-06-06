@@ -1,0 +1,409 @@
+#include "dropdialog.h"
+#include "ui_dropdialog.h"
+
+dropDialog::dropDialog(int id, QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::dropDialog)
+{
+    ui->setupUi(this);
+    setAcceptDrops(true);
+    resize(500, 150);
+    setMinimumSize(500, 150);
+    ui->loadFileBtn->setEnabled(false);
+    idList = id;
+    defaultColor = palette().color(backgroundRole());
+}
+
+dropDialog::~dropDialog()
+{
+    delete ui;
+}
+
+void dropDialog::dragEnterEvent(QDragEnterEvent *e)
+{
+    if (e->mimeData()->hasUrls()) {
+        e->acceptProposedAction();
+
+        //QPalette Pal(palette());
+        //Pal.setColor(QPalette::Background, QColor(200, 200, 200));
+        //setAutoFillBackground(true);
+        //setPalette(Pal);
+
+
+        QPalette Pal(palette());
+        //QPixmap bkgnd("bkgnd2.jpg");
+        QPixmap bkgnd(":/images/background/bkgnd.jpg");
+        bkgnd = bkgnd.scaled(this->size(), Qt::IgnoreAspectRatio);
+        Pal.setBrush(QPalette::Background, bkgnd);
+        setPalette(Pal);
+
+
+        //setStyleSheet("background-image : url(dropDialogBackground.png)");
+
+    }
+}
+
+void dropDialog::dragLeaveEvent(QDragLeaveEvent *event)
+{
+    QPalette Pal(palette());
+    Pal.setColor(QPalette::Background, defaultColor);
+    setAutoFillBackground(true);
+    setPalette(Pal);
+}
+
+void dropDialog::dropEvent(QDropEvent *e)
+{
+    foreach (const QUrl &url, e->mimeData()->urls()) {
+        QString fileName = url.toLocalFile();
+
+        if(fileName.right(4) != ".odt")
+        {
+            QMessageBox::critical(this, "Внимание!", "Необходимо выбрать файл формата odt!");
+            QPalette Pal(palette());
+            Pal.setColor(QPalette::Background, defaultColor);
+            setAutoFillBackground(true);
+            setPalette(Pal);
+            return;
+        }
+        ui->lineEdit->setText(fileName);
+        ui->loadFileBtn->setEnabled(true);
+        qDebug() << "Dropped file:" << fileName;
+    }
+    QPalette Pal(palette());
+    Pal.setColor(QPalette::Background, defaultColor);
+    setAutoFillBackground(true);
+    setPalette(Pal);
+}
+
+void dropDialog::on_openFileBtn_clicked()
+{
+    // имя файла
+    QString filename = QFileDialog::getOpenFileName(this, QString::fromUtf8("Открыть файл"),
+                                                        QDir::currentPath(), "Text (*.odt);;");
+    if(filename.isEmpty())
+    {
+        return;
+    }
+    // если формат не odt
+    else if(filename.right(4) != ".odt")
+    {
+        QMessageBox::critical(this, "Внимание!", "Необходимо выбрать файл формата odt");
+        return;
+    }
+    else
+    {
+        ui->lineEdit->setText(filename);
+        ui->loadFileBtn->setEnabled(true);
+    }
+}
+
+void dropDialog::on_loadFileBtn_clicked()
+{
+    QFile file(ui->lineEdit->text());
+    QString filename = ui->lineEdit->text();
+    if(!file.exists())
+    {
+        QMessageBox::critical(this, "Внимание!", "Файл не существует!");
+        return;
+    }
+    else if(filename.right(4) != ".odt")
+    {
+        QMessageBox::critical(this, "Внимание!", "Необходимо выбрать файл формата odt");
+        return;
+    }
+    else
+    {
+       // MainWindow *a;
+        //a->loadQuestionsInList(idList, ui->lineEdit->text());
+
+        int result = load(idList, ui->lineEdit->text());
+
+        switch (result) {
+        case 0:
+            QMessageBox::information(this, "Перфект", "Вопросы успешно загружены");
+            break;
+        default:
+            break;
+        }
+        close();
+    }
+}
+
+void dropDialog::on_cancelBtn_clicked()
+{
+    close();
+}
+
+void dropDialog::on_lineEdit_textEdited(const QString &arg1)
+{
+    if(ui->lineEdit->text().isEmpty())
+        ui->loadFileBtn->setEnabled(false);
+    else
+        ui->loadFileBtn->setEnabled(true);
+}
+
+int dropDialog::load(int questListID, QString filepath)
+{
+    QDir().mkdir("input");
+    QFile::copy(filepath, QDir::currentPath() + "/input/input.odt");
+
+    // создание открытие/файла .odt и папки для архива
+    QString fileName = "input.odt";
+    QString fileNameZip = "input.zip";
+
+    QString filePath = "input/";
+    //QDir().mkdir(filePath);
+    QString zipPath = filePath + "zip/";
+    QDir().mkdir(zipPath);
+    QFile inputFile(filePath + fileName);
+    if(!inputFile.open(QIODevice::ReadWrite | QIODevice::Text))
+    {
+        qDebug() << "Файл не открыт";
+        return 1;
+    }
+    inputFile.close();
+    // поиск id списка вопросов
+
+    // открываем libreoffice
+//        proc = new QProcess();
+//        proc->start("swriter -o " + filePath + fileName);
+//        if(!proc->waitForStarted()){
+//            qDebug() << "Процесс не запущен";
+//            return;
+//        }
+//        if (!proc->waitForFinished()){
+//            qDebug() << "Процесс не может завершиться";
+//            //return;
+//        }
+
+    //qDebug() << "Процесс завершен. Изменения прошли";
+
+    // разархивация архива в папку zip
+    QFile::copy(filePath + fileName, zipPath + fileName);
+    QFile::rename(zipPath + fileName, zipPath + fileNameZip);
+    JlCompress::extractDir(zipPath + fileNameZip, zipPath);
+
+    // парсер
+
+    QFile * file = new QFile(zipPath + "content.xml");
+    if (!file->open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        file->close();
+        QDir dir(filePath);
+        dir.removeRecursively();
+        qDebug() << "Невозможно открыть XML-файл";
+        return 2;
+    }
+
+
+    QStringList BODY_LIST;
+    QList<int> LEVEL_LIST;
+    QStringList TOPIC_LIST;
+    QStringList HREF_LIST;
+    QMap<int, QStringList> map;
+    QMap<QString, QString> objectName;
+
+    // подсчет cell
+    int i = 0;
+    int quest = 0;
+    int object = 1;
+    QVector<bool> vec;
+    bool lvl = false;
+    int depth = 0;
+    QXmlStreamReader reader(file);
+
+    while (!reader.atEnd() && !reader.hasError())
+    {
+        QXmlStreamReader::TokenType token = reader.readNext();
+        if (token == QXmlStreamReader::StartDocument)
+            continue;
+        if (reader.name() != "table-cell")
+            continue;
+        if (reader.name() == "table-cell")
+        {
+            if(token == QXmlStreamReader::StartElement)
+                depth++;
+            else if(token == QXmlStreamReader::EndElement)
+                depth--;
+            if(depth == 2)
+                lvl = true;
+            else if(depth == 0)
+                lvl = false;
+            if(depth == 1 && !lvl)
+            {
+                i++;
+                vec.append(true);
+
+                if(i%3 == 1)
+                {
+                    reader.readNext();
+                    reader.readNext();
+                    LEVEL_LIST.append(reader.text().toInt());
+                    qDebug() << "level " << reader.text().toString();
+                }
+
+                else if(i%3 == 2)
+                {
+                    reader.readNext();
+                    reader.readNext();
+                    TOPIC_LIST.append(reader.text().toString());
+                    qDebug() << "topic " << reader.text().toString();
+                }
+
+                else if (i%3 == 0)
+                {
+                    QStringList hrefList;
+                    while (reader.readNext() && lvl == false)
+                    {
+                        // обработка ссылок на объекты
+                        if(reader.attributes().hasAttribute("xlink:href"))
+                        {
+                            //qDebug() << reader.attributes().value("xlink:href").toString();
+                            QString oldObjectName = reader.attributes().value("xlink:href").toString();
+                            // если объект картинка
+                            if(oldObjectName.left(8) == "Pictures")
+                            {
+                                hrefList.append(oldObjectName);
+                                qDebug() << oldObjectName;
+                            }
+                            // если формула
+                            else if(oldObjectName.left(20) == "./ObjectReplacements")
+                            {
+                                // переименовываем
+                                QString newObjectReplacementName = QString("%1 %2_%3").arg("./ObjectReplacements/Object").arg(questListID).arg(object);
+                                hrefList.append(newObjectReplacementName);
+
+                                QString oldPath = zipPath + oldObjectName.mid(2);
+                                QString newPath = zipPath + newObjectReplacementName.mid(2);
+                                QFile::rename( oldPath, newPath);
+
+                                objectName[oldObjectName] = newObjectReplacementName;
+                                qDebug() << newObjectReplacementName;
+
+                                object++;
+
+                            }
+                            else if(oldObjectName.left(8) == "./Object")
+                            {
+                                // переименовываем
+                                QString newObjectName = QString("%1 %2_%3").arg("./Object").arg(questListID).arg(object);
+                                hrefList.append(newObjectName);
+
+                                QString oldPath = zipPath + oldObjectName.mid(2);
+                                QString newPath = zipPath + newObjectName.mid(2);
+                                QFile::rename( oldPath, newPath);
+
+                                objectName[oldObjectName] = newObjectName;
+                                qDebug() << newObjectName;
+                            }
+                        }
+
+                        if (reader.name() == "table-cell")
+                        {
+                            if(reader.tokenType() == QXmlStreamReader::StartElement)
+                                depth++;
+                            else if(reader.tokenType() == QXmlStreamReader::EndElement)
+                                depth--;
+                            if(depth == 1)
+                                vec.append(true);
+                            if(depth == 2)
+                            {
+                                lvl = true;
+                                vec.append(false);
+                            }
+                            else if(depth == 0)
+                            {
+                                lvl = false;
+                                break;
+                            }
+                        }
+                    }
+                    map[quest] = hrefList;
+                    // новый вопрос
+                    quest++;
+                    qDebug() << "AZAZAZAZA";
+                    // данные о вопросе собраны -> сохранение в  структуру
+                }
+            }
+            else if(depth == 2)
+                vec.append(false);
+
+        }
+    }
+    file->seek(0);
+
+
+    qDebug() << quest;
+
+
+    QDomDocument domDoc;
+    domDoc.setContent(file);
+    QDomElement rootElement = domDoc.documentElement();
+    //qDebug("root element has %d childs", rootElement.childNodes().count());
+    //qDebug("root element is  %s ",  qPrintable(rootElement.nodeName()) );
+    QDomNodeList alist = rootElement.elementsByTagName("table:table-cell");
+    QStringList list;
+
+
+    // обход всех тегов table-cell и изъятие содержимого body
+    for (int i = 0; i < alist.length(); i++)
+    {
+        QDomNode a = alist.at(i);
+        QString aContent;
+        QTextStream ts(&aContent);
+        QDomNodeList child = a.childNodes();
+        for(int j = 0; j < child.size(); j++)
+            child.at(j).save(ts, 0);
+        list.append(aContent);
+    }
+
+    // выделение нужных строк
+    for (int i = 0; i < list.length(); i++)
+        if(vec[i])
+            BODY_LIST.append(list[i+=2]);
+
+
+    // переименовываем имена объектов в body вопросов
+    for (int i = 0; i < BODY_LIST.length(); i++)
+    {
+        QString body = BODY_LIST[i];
+        QMap<QString, QString>::iterator iter;
+        for(iter = objectName.begin(); iter != objectName.end(); iter++)
+        {
+            QString old = iter.key();
+            if(body.contains(old))
+                body.replace(old, iter.value());
+        }
+        BODY_LIST[i] = body;
+        qDebug() << body << "\n";
+    }
+
+    file->seek(0);
+
+
+    QXmlStreamReader xml(file);
+    QMap<QString, QString> etap;
+    QStringList strlist;
+
+    QString topic;
+    int level = 0;
+
+    QList<Quest> lst;
+
+    for(int i = 0; i < quest; i++)
+    {
+        Quest a;
+        a.level = LEVEL_LIST[i];
+        a.topic = TOPIC_LIST[i];
+        a.body = BODY_LIST[i];
+    }
+
+
+    int G = 2;
+    file->close();
+    //QDir dir(filePath);
+    //dir.removeRecursively();
+
+    // загрузка в БД
+    return 0;
+}

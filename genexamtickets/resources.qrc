@@ -1,0 +1,15 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>icon/EXIT.png</file>
+        <file>icon/gen.png</file>
+        <file>icon/info.png</file>
+        <file>icon/save.png</file>
+        <file>icon/clear.png</file>
+        <file>icon/load.png</file>
+        <file>icon/downarrow.png</file>
+        <file>icon/leftarrow.png</file>
+        <file>icon/rightarrow.png</file>
+        <file>icon/uparrow.png</file>
+        <file>background/bkgnd.jpg</file>
+    </qresource>
+</RCC>
