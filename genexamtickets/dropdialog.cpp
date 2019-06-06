@@ -126,6 +126,9 @@ void dropDialog::on_loadFileBtn_clicked()
         case 4:
             QMessageBox::information(this, "Загрузка вопросов в список вопросов", "Невозможно создать архив");
             break;
+        case -1:
+            QMessageBox::information(this, "Загрузка вопросов в список вопросов", "Список вопросов не создан");
+            break;
         default:
             break;
         }

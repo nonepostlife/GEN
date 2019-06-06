@@ -233,6 +233,9 @@ int GenerateForm::on_generate_clicked()
         QMessageBox::critical(this, "Генерация билетов", "Не удалось сгенерировать билеты с выравниваем по теме. "
                                                          "Попробуйте увеличить коэффициент, либо изменить списки вопросов!");
         break;
+    case -1:
+        QMessageBox::information(this, "Генерация билетов", "Список билетов не создан!");
+        break;
     default:
         break;
     }
