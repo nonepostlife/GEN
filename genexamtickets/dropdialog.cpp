@@ -180,25 +180,25 @@ void dropDialog::on_editFileBtn_clicked()
         if(!proc->waitForStarted())
         {
             qDebug() << "Процесс не запущен!";
-            //return;
+
+            proc->start("libreoffice --writer -o " + filepath + "");
+
+            if(!proc->waitForStarted())
+            {
+                qDebug() << "Процесс не запущен!";
+                return;
+            }
+            if(!proc->waitForFinished())
+            {
+                qDebug() << "Процесс не может завершиться!";
+                return;
+            }
+            return;
         }
         if(!proc->waitForFinished())
         {
             qDebug() << "Процесс не может завершиться!";
-            //return;
-        }
-
-        proc->start("libreoffice --writer -o " + filepath + "");
-
-        if(!proc->waitForStarted())
-        {
-            qDebug() << "Процесс не запущен!";
-            //return;
-        }
-        if(!proc->waitForFinished())
-        {
-            qDebug() << "Процесс не может завершиться!";
-            //return;
+            return;
         }
     }
 }
