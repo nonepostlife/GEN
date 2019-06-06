@@ -89,7 +89,7 @@ private:
     void                        createMenus();
     void                        createStatusBar();
 
-    void                        initDatabase();
+    bool                        initDatabase();
     void                        updateTable();
     void                        showQuestionsInList(int questListID);
 

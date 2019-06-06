@@ -8,14 +8,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     createActions();
     createMenus();
-    initDatabase();
-
-    ui->showQuestInList->setIcon(QIcon(":/images/icon/downarrow.png"));
-    ui->questionTopic->setVisible(false);
-    ui->showQuestInList->setStatusTip(tr("Отобразить вопросы для выделенного списка"));
-    ui->addQuestionList->setStatusTip(tr("Добавить список вопросов в таблицу"));
-    ui->removeQuestionList->setStatusTip(tr("Удалить список вопросов из таблицы"));
-    ui->searchLine->setStatusTip(tr("Поиск списка вопросов по названию"));
+    if(!initDatabase())
+    {
+        setEnabled(false);
+        QMessageBox::critical(this, "Ошибка", "База данных не содержит необходимых таблиц");
+        return;
+    }
+    setDefaultTicketsList();
 
     GENLIB = new gentickets();
     int result = GENLIB->setConnection(db);
@@ -25,8 +24,12 @@ MainWindow::MainWindow(QWidget *parent) :
         return;
     }
 
-    setDefaultTicketsList();
-
+    ui->showQuestInList->setIcon(QIcon(":/images/icon/downarrow.png"));
+    ui->questionTopic->setVisible(false);
+    ui->showQuestInList->setStatusTip(tr("Отобразить вопросы для выделенного списка"));
+    ui->addQuestionList->setStatusTip(tr("Добавить список вопросов в таблицу"));
+    ui->removeQuestionList->setStatusTip(tr("Удалить список вопросов из таблицы"));
+    ui->searchLine->setStatusTip(tr("Поиск списка вопросов по названию"));
     auto *eqCb = new ComboBoxDelegate(ui->tableQuestList);
     ui->tableQuestList->setItemDelegateForColumn(4, eqCb);
     ui->tableQuestList->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -207,17 +210,33 @@ void MainWindow::showTagHelp()
     }
 }
 
-void MainWindow::initDatabase()
+bool MainWindow::initDatabase()
 {
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("gendb.db");
-    //db.setDatabaseName("gentickets.db");
     if (!db.open()){
         qDebug() << "Cannot open database:" << db.lastError();
-        return;
+        return false;
     }
     else
     {
+        QStringList tableName;
+        tableName << "Dep" << "Disc" <<"QuestionList" << "Questions" << "TicketsList" << "QuestOfTickets" << "Tickets";
+
+        for (int i = 0; i < tableName.count(); i++)
+        {
+            QSqlQuery q(db);
+            q.prepare("SELECT name FROM sqlite_master where type='table' and name = ?");
+            q.addBindValue(tableName[i]);
+            q.exec();
+            if(!q.next())
+            {
+                qDebug() << "База данных не содержит необходимых таблиц";
+                close();
+                return false;
+            }
+        }
+
         db.exec("pragma foreign_keys=on");
         tables.push_back(table(0, "Disc", "Дисциплина", "discName", "discID", nullptr, nullptr, nullptr, db));
         tables.push_back(table(1, "Dep", "Кафедра", "depName", "depID", nullptr, nullptr, nullptr, db));
@@ -238,6 +257,7 @@ void MainWindow::initDatabase()
             });
         }
         updateTable();
+        return true;
     }
 }
 
