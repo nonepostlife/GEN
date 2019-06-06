@@ -109,6 +109,9 @@ void GenerateForm::on_sortUp_clicked()
         QString itemText = index.data(Qt::DisplayRole).toString();
         int _Row = ui->listView->selectionModel()->currentIndex().row();
 
+        if(_Row == 0)
+            return;
+
         listModel->removeRows(_Row, 1);
         listModel->insertRow(_Row - 1);
         QModelIndex index2 = listModel->index(_Row - 1);
@@ -124,6 +127,9 @@ void GenerateForm::on_sortDown_clicked()
         QModelIndex index = ui->listView->selectionModel()->currentIndex();
         QString itemText = index.data(Qt::DisplayRole).toString();
         int _Row = ui->listView->selectionModel()->currentIndex().row();
+
+        if(_Row == ui->listView->model()->rowCount() - 1)
+            return;
 
         listModel->removeRows(_Row, 1);
         listModel->insertRow(_Row + 1);

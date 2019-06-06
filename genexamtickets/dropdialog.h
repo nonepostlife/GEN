@@ -34,7 +34,7 @@ private slots:
 
     void on_cancelBtn_clicked();
 
-    void on_lineEdit_textEdited(const QString &arg1);
+    void on_inputFile_textEdited(const QString &arg1);
 
     void on_editFileBtn_clicked();
 

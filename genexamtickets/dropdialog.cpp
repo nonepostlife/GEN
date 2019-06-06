@@ -10,6 +10,7 @@ dropDialog::dropDialog(int id, QSqlDatabase db, QWidget *parent) :
     resize(500, 150);
     setMinimumSize(500, 150);
     ui->loadFileBtn->setEnabled(false);
+    ui->editFileBtn->setEnabled(false);
     idList = id;
     defaultColor = palette().color(backgroundRole());
     database = db;
@@ -38,6 +39,8 @@ void dropDialog::dragEnterEvent(QDragEnterEvent *e)
 
 void dropDialog::dragLeaveEvent(QDragLeaveEvent *event)
 {
+    (void)event;
+
     QPalette Pal(palette());
     Pal.setColor(QPalette::Background, defaultColor);
     setAutoFillBackground(true);
@@ -58,8 +61,9 @@ void dropDialog::dropEvent(QDropEvent *e)
             setPalette(Pal);
             return;
         }
-        ui->lineEdit->setText(fileName);
+        ui->inputFile->setText(fileName);
         ui->loadFileBtn->setEnabled(true);
+        ui->editFileBtn->setEnabled(true);
         qDebug() << "Dropped file:" << fileName;
     }
     QPalette Pal(palette());
@@ -87,15 +91,16 @@ void dropDialog::on_openFileBtn_clicked()
     }
     else
     {
-        ui->lineEdit->setText(filename);
+        ui->inputFile->setText(filename);
         ui->loadFileBtn->setEnabled(true);
+        ui->editFileBtn->setEnabled(true);
     }
 }
 
 void dropDialog::on_loadFileBtn_clicked()
 {
-    QFile file(ui->lineEdit->text());
-    QString filename = ui->lineEdit->text();
+    QFile file(ui->inputFile->text());
+    QString filename = ui->inputFile->text();
     if(!file.exists())
     {
         QMessageBox::critical(this, "Внимание!", "Файл не существует!");
@@ -108,7 +113,7 @@ void dropDialog::on_loadFileBtn_clicked()
     }
     else
     {
-        int result =  GENLIB->loadQuestionsToList(idList, ui->lineEdit->text());
+        int result =  GENLIB->loadQuestionsToList(idList, ui->inputFile->text());
 
         switch (result) {
         case 0:
@@ -141,28 +146,36 @@ void dropDialog::on_cancelBtn_clicked()
     close();
 }
 
-void dropDialog::on_lineEdit_textEdited(const QString &arg1)
+void dropDialog::on_inputFile_textEdited(const QString &arg1)
 {
-    if(ui->lineEdit->text().isEmpty())
+    (void)arg1;
+
+    if(ui->inputFile->text().isEmpty())
+    {
         ui->loadFileBtn->setEnabled(false);
+        ui->editFileBtn->setEnabled(false);
+    }
     else
+    {
         ui->loadFileBtn->setEnabled(true);
+        ui->editFileBtn->setEnabled(true);
+    }
 }
 
 void dropDialog::on_editFileBtn_clicked()
 {
-    QString filepath = ui->lineEdit->text();
+    QString filepath = ui->inputFile->text();
     qDebug() << filepath;
     QFile file(filepath);
     if(!file.exists())
     {
-        QMessageBox::critical(this, "Ошибка", "Невозможно открыть файл!");
+        QMessageBox::critical(this, "Ошибка", "Невозможно открыть файл! Файл не существует!");
         return;
     }
     else
     {
         proc = new QProcess();
-        proc->start("swriter -o '" + filepath + "'");
+        proc->start("swriter -o " + filepath + "");
         if(!proc->waitForStarted())
         {
             qDebug() << "Процесс не запущен!";

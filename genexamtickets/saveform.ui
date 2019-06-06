@@ -42,7 +42,7 @@
         <item>
          <widget class="QPushButton" name="printButton">
           <property name="text">
-           <string>Печать</string>
+           <string>Сохранить как</string>
           </property>
          </widget>
         </item>
@@ -95,7 +95,6 @@
    </widget>
    <addaction name="menu"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <action name="deleteListAction">
    <property name="icon">
     <iconset resource="resources.qrc">
