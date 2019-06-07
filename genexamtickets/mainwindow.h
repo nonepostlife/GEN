@@ -20,6 +20,8 @@
 #include <QStandardItem>
 #include <QCheckBox>
 #include <QSpinBox>
+#include <QDesktopServices>
+#include <QHelpEngineCore>
 
 #include <QtSql/QSqlDatabase>
 #include <QtSql>

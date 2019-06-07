@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui sql printsupport xml xmlpatterns testlib
+QT       += core gui sql printsupport xml xmlpatterns testlib help
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets sql
 

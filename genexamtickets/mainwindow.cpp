@@ -157,57 +157,80 @@ void MainWindow::aboutProgramm()
 
 void MainWindow::showTagHelp()
 {
-    QDialog *what = new QDialog();
-    what->resize(600, 250);
-    what->setWindowTitle("Справка по тегам для составления списка вопросов");
-    QVBoxLayout * box = new QVBoxLayout();
 
-    QTableWidget * tagTable = new QTableWidget(3, 2);
-    tagTable->setHorizontalHeaderItem(0, new QTableWidgetItem("Тег"));
-    tagTable->setHorizontalHeaderItem(1, new QTableWidgetItem("Применение"));
-    tagTable->verticalHeader()->setVisible(false);
-    tagTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
-    tagTable->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    QDesktopServices::openUrl(QUrl("mycollection.chm"));
 
-    QTableWidgetItem *item = new QTableWidgetItem();
-    item->setFlags(Qt::ItemIsEnabled);
-    QTableWidgetItem *item2 = new QTableWidgetItem();
-    item2->setFlags(Qt::ItemIsEnabled);
-    QTableWidgetItem *item3 = new QTableWidgetItem();
-    item3->setFlags(Qt::ItemIsEnabled);
-    QTableWidgetItem *item4 = new QTableWidgetItem();
-    item4->setFlags(Qt::ItemIsEnabled);
-    QTableWidgetItem *item5 = new QTableWidgetItem();
-    item5->setFlags(Qt::ItemIsEnabled);
-    QTableWidgetItem *item6 = new QTableWidgetItem();
-    item6->setFlags(Qt::ItemIsEnabled);
 
-    item->setText("#");
-    item2->setText("$");
-    item3->setText("@");
-    item4->setText("Между этими символами пишется тема вопроса\nПример - #Qt#");
-    item5->setText("Между этими символами задается сложность вопроса\nПример - $2$");
-    item6->setText("Между этими символами пишется текст вопроса\nПример - @Модели Qt для работы с базами данных.@");
+//    QHelpEngineCore helpEngine("mycollection.qhc");
 
-    tagTable->setItem(0, 0, item);
-    tagTable->setItem(1, 0, item2);
-    tagTable->setItem(2, 0, item3);
-    tagTable->setItem(0, 1, item4);
-    tagTable->setItem(1, 1, item5);
-    tagTable->setItem(2, 1, item6);
+//    // get all file references for the identifier
+//    QMap<QString, QUrl> links =
+//        helpEngine.linksForIdentifier(QLatin1String("MyDialog::ChangeButton"));
 
-    QDialogButtonBox * ok = new QDialogButtonBox(QDialogButtonBox::Ok);
-    QObject::connect(ok, SIGNAL(accepted()), what, SLOT(accept()));
-    QObject::connect(ok, SIGNAL(rejected()), what, SLOT(reject()));
-    box->addWidget(tagTable);
-    box->addWidget(ok);
-    what->setLayout(box);
+//    // If help is available for this keyword, get the help data
+//    // of the first file reference.
+//    if (links.count()) {
+//        QByteArray helpData = helpEngine.fileData(links.constBegin().value());
+//        // show the documentation to the user
+//        if (!helpData.isEmpty())
+//            displayHelp(helpData);
 
-    auto result = what->exec();
-    if(result == QDialog::Accepted)
-    {
-        what->close();
-    }
+//    }
+
+
+
+
+//    QDialog *what = new QDialog();
+//    what->resize(600, 250);
+//    what->setWindowTitle("Справка по тегам для составления списка вопросов");
+//    QVBoxLayout * box = new QVBoxLayout();
+
+//    QTableWidget * tagTable = new QTableWidget(3, 2);
+//    tagTable->setHorizontalHeaderItem(0, new QTableWidgetItem("Тег"));
+//    tagTable->setHorizontalHeaderItem(1, new QTableWidgetItem("Применение"));
+//    tagTable->verticalHeader()->setVisible(false);
+//    tagTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+//    tagTable->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
+//    QTableWidgetItem *item = new QTableWidgetItem();
+//    item->setFlags(Qt::ItemIsEnabled);
+//    QTableWidgetItem *item2 = new QTableWidgetItem();
+//    item2->setFlags(Qt::ItemIsEnabled);
+//    QTableWidgetItem *item3 = new QTableWidgetItem();
+//    item3->setFlags(Qt::ItemIsEnabled);
+//    QTableWidgetItem *item4 = new QTableWidgetItem();
+//    item4->setFlags(Qt::ItemIsEnabled);
+//    QTableWidgetItem *item5 = new QTableWidgetItem();
+//    item5->setFlags(Qt::ItemIsEnabled);
+//    QTableWidgetItem *item6 = new QTableWidgetItem();
+//    item6->setFlags(Qt::ItemIsEnabled);
+
+//    item->setText("#");
+//    item2->setText("$");
+//    item3->setText("@");
+//    item4->setText("Между этими символами пишется тема вопроса\nПример - #Qt#");
+//    item5->setText("Между этими символами задается сложность вопроса\nПример - $2$");
+//    item6->setText("Между этими символами пишется текст вопроса\nПример - @Модели Qt для работы с базами данных.@");
+
+//    tagTable->setItem(0, 0, item);
+//    tagTable->setItem(1, 0, item2);
+//    tagTable->setItem(2, 0, item3);
+//    tagTable->setItem(0, 1, item4);
+//    tagTable->setItem(1, 1, item5);
+//    tagTable->setItem(2, 1, item6);
+
+//    QDialogButtonBox * ok = new QDialogButtonBox(QDialogButtonBox::Ok);
+//    QObject::connect(ok, SIGNAL(accepted()), what, SLOT(accept()));
+//    QObject::connect(ok, SIGNAL(rejected()), what, SLOT(reject()));
+//    box->addWidget(tagTable);
+//    box->addWidget(ok);
+//    what->setLayout(box);
+
+//    auto result = what->exec();
+//    if(result == QDialog::Accepted)
+//    {
+//        what->close();
+//    }
 }
 
 bool MainWindow::initDatabase()
