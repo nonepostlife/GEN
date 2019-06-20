@@ -898,7 +898,7 @@ int gentickets::createContentFile(int ticketsListID, QMap<QString, QString> *arg
     if(arguments == nullptr)
     {
         header = "МИНИСТЕРСТВО НАУКИ И ВЫСШЕГО ОБРАЗОВАНИЯ РОССИЙСКОЙ ФЕДЕРАЦИИ";
-        university_1 = "Федеральное государственное бюджетное образовательное учреждение высшего профессионального образования";
+        university_1 = "Федеральное государственное бюджетное образовательное учреждение высшего образования";
         university_2 = "Тихоокеанский Государственный Университет";
         specialty = "09.03.04 Программная инженерия";
     }
@@ -913,7 +913,7 @@ int gentickets::createContentFile(int ticketsListID, QMap<QString, QString> *arg
         if(arguments->contains("UNIVERSITY_1"))
             university_1 = arguments->value("UNIVERSITY_1");
         else {
-            university_1 = "Федеральное государственное бюджетное образовательное учреждение высшего профессионального образования";
+            university_1 = "Федеральное государственное бюджетное образовательное учреждение высшего образования";
         }
 
         if(arguments->contains("UNIVERSITY_2"))

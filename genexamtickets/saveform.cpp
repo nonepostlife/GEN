@@ -20,6 +20,8 @@ saveform::saveform(QSqlRelationalTableModel *ticketsListTable, QSqlDatabase indb
     ui->tableTicketsList->setColumnHidden(0, true);
     ui->tableTicketsList->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
     ui->tableTicketsList->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
+    ui->tableTicketsList->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch);
+    ui->tableTicketsList->horizontalHeader()->setSectionResizeMode(4, QHeaderView::Stretch);
     ui->tableTicketsList->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     ui->tableTicketsList->setEditTriggers(QAbstractItemView::NoEditTriggers);

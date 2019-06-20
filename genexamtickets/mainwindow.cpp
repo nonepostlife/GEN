@@ -57,7 +57,7 @@ void MainWindow::createActions()
     genAct->setIcon(QIcon(":/images/icon/gen.png"));
     connect(genAct, &QAction::triggered, this, &MainWindow::generateTickets);
 
-    saveAct = new QAction(tr("Сохранить документ"), this);
+    saveAct = new QAction(tr("Сохранить билеты"), this);
     saveAct->setShortcuts(QKeySequence::Save);
     saveAct->setStatusTip(tr("Сохранить документ с экзаменационными билетами"));
     saveAct->setIcon(QIcon(":/images/icon/save.png"));
@@ -158,7 +158,7 @@ void MainWindow::aboutProgramm()
 void MainWindow::showTagHelp()
 {
 
-    QDesktopServices::openUrl(QUrl("mycollection.chm"));
+    QDesktopServices::openUrl(QUrl("GenHelp.chm"));
 
 
 //    QHelpEngineCore helpEngine("mycollection.qhc");
